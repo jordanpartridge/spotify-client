@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jordanpartridge\SpotifyClient;
 
+use Jordanpartridge\SpotifyClient\Auth\SpotifyAuthConnector;
 use Jordanpartridge\SpotifyClient\Commands\SpotifyInstallCommand;
 use Jordanpartridge\SpotifyClient\Contracts\SpotifyClientInterface;
 use Jordanpartridge\SpotifyClient\Services\CredentialValidator;
@@ -29,6 +30,10 @@ class SpotifyClientServiceProvider extends PackageServiceProvider
         // Register core services
         $this->app->singleton(SpotifyConnector::class, function () {
             return new SpotifyConnector();
+        });
+
+        $this->app->singleton(SpotifyAuthConnector::class, function () {
+            return new SpotifyAuthConnector();
         });
 
         $this->app->singleton(SpotifyClientInterface::class, function ($app) {

@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Jordanpartridge\SpotifyClient\Services;
 
 use Jordanpartridge\SpotifyClient\SpotifyConnector;
+use Jordanpartridge\SpotifyClient\Requests\Browse\GetCategoriesRequest;
 use Saloon\Exceptions\Request\RequestException;
+use Saloon\Http\Auth\TokenAuthenticator;
 
 class CredentialValidator
 {
@@ -18,21 +20,17 @@ class CredentialValidator
     public function testConnection(array $tokens): array
     {
         try {
-            $response = $this->httpClient->get(self::SPOTIFY_API_BASE, [
-                'headers' => [
-                    'Authorization' => "Bearer {$tokens['access_token']}",
-                ],
-                'timeout' => 10,
-            ]);
+            // Configure the connector with authentication
+            $this->connector->authenticate(new TokenAuthenticator($tokens['access_token']));
+            
+            $startTime = microtime(true);
+            $response = $this->connector->send(new GetCategoriesRequest(1, 0));
+            $responseTime = round((microtime(true) - $startTime) * 1000, 2);
 
             return [
-                'success' => $response->getStatusCode() === 200,
+                'success' => $response->successful(),
                 'message' => 'API connection successful',
-                'response_time' => $this->measureResponseTime(function () use ($tokens) {
-                    return $this->httpClient->get(self::SPOTIFY_API_BASE, [
-                        'headers' => ['Authorization' => "Bearer {$tokens['access_token']}"],
-                    ]);
-                }),
+                'response_time' => $responseTime,
             ];
 
         } catch (RequestException $e) {
@@ -47,18 +45,14 @@ class CredentialValidator
     public function testAuthentication(array $tokens): array
     {
         try {
+            // Configure the connector with authentication
+            $this->connector->authenticate(new TokenAuthenticator($tokens['access_token']));
+            
             // Test with a simple API call that requires authentication
-            $response = $this->httpClient->get(self::SPOTIFY_API_BASE . '/browse/categories', [
-                'headers' => [
-                    'Authorization' => "Bearer {$tokens['access_token']}",
-                ],
-                'query' => ['limit' => 1],
-            ]);
-
-            $data = json_decode($response->getBody()->getContents(), true);
+            $response = $this->connector->send(new GetCategoriesRequest(1, 0));
 
             return [
-                'success' => true,
+                'success' => $response->successful(),
                 'message' => 'Authentication successful',
                 'token_info' => [
                     'token_type' => $tokens['token_type'] ?? 'Bearer',

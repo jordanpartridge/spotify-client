@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Jordanpartridge\SpotifyClient\Services;
 
-use Jordanpartridge\SpotifyClient\SpotifyConnector;
+use Jordanpartridge\SpotifyClient\Auth\SpotifyAuthConnector;
+use Jordanpartridge\SpotifyClient\Auth\Requests\ClientCredentialsTokenRequest;
+use Jordanpartridge\SpotifyClient\Auth\Requests\AuthorizationCodeTokenRequest;
+use Jordanpartridge\SpotifyClient\Auth\Requests\RefreshTokenRequest;
 use Saloon\Exceptions\Request\RequestException;
 use React\EventLoop\Loop;
 use React\Http\HttpServer;
@@ -22,24 +25,15 @@ class OAuthFlowHandler
     private ?array $tokens = null;
 
     public function __construct(
-        private readonly SpotifyConnector $connector
+        private readonly SpotifyAuthConnector $authConnector
     ) {}
 
     public function getClientCredentialsToken(string $clientId, string $clientSecret): array
     {
         try {
-            $response = $this->httpClient->post(self::SPOTIFY_TOKEN_URL, [
-                'form_params' => [
-                    'grant_type' => 'client_credentials',
-                    'client_id' => $clientId,
-                    'client_secret' => $clientSecret,
-                ],
-                'headers' => [
-                    'Content-Type' => 'application/x-www-form-urlencoded',
-                ],
-            ]);
-
-            $data = json_decode($response->getBody()->getContents(), true);
+            $request = new ClientCredentialsTokenRequest($clientId, $clientSecret);
+            $response = $this->authConnector->send($request);
+            $data = $response->json();
 
             return [
                 'access_token' => $data['access_token'],
@@ -134,20 +128,15 @@ class OAuthFlowHandler
         }
 
         try {
-            $response = $this->httpClient->post(self::SPOTIFY_TOKEN_URL, [
-                'form_params' => [
-                    'grant_type' => 'authorization_code',
-                    'code' => $this->authorizationCode,
-                    'redirect_uri' => 'http://localhost:8080/callback',
-                    'client_id' => $appConfig['client_id'],
-                    'client_secret' => $appConfig['client_secret'],
-                ],
-                'headers' => [
-                    'Content-Type' => 'application/x-www-form-urlencoded',
-                ],
-            ]);
-
-            $data = json_decode($response->getBody()->getContents(), true);
+            $request = new AuthorizationCodeTokenRequest(
+                $this->authorizationCode,
+                'http://localhost:8080/callback',
+                $appConfig['client_id'],
+                $appConfig['client_secret']
+            );
+            
+            $response = $this->authConnector->send($request);
+            $data = $response->json();
 
             $this->tokens = [
                 'access_token' => $data['access_token'],
@@ -168,19 +157,14 @@ class OAuthFlowHandler
     public function refreshToken(string $refreshToken, array $appConfig): array
     {
         try {
-            $response = $this->httpClient->post(self::SPOTIFY_TOKEN_URL, [
-                'form_params' => [
-                    'grant_type' => 'refresh_token',
-                    'refresh_token' => $refreshToken,
-                    'client_id' => $appConfig['client_id'],
-                    'client_secret' => $appConfig['client_secret'],
-                ],
-                'headers' => [
-                    'Content-Type' => 'application/x-www-form-urlencoded',
-                ],
-            ]);
-
-            $data = json_decode($response->getBody()->getContents(), true);
+            $request = new RefreshTokenRequest(
+                $refreshToken,
+                $appConfig['client_id'],
+                $appConfig['client_secret']
+            );
+            
+            $response = $this->authConnector->send($request);
+            $data = $response->json();
 
             return [
                 'access_token' => $data['access_token'],

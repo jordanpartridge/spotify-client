@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Jordanpartridge\SpotifyClient\Services;
 
-use Jordanpartridge\SpotifyClient\SpotifyConnector;
+use Jordanpartridge\SpotifyClient\Auth\SpotifyAuthConnector;
+use Jordanpartridge\SpotifyClient\Auth\Requests\ClientCredentialsTokenRequest;
 use Saloon\Exceptions\Request\RequestException;
 
 class SpotifyAppManager
@@ -13,7 +14,7 @@ class SpotifyAppManager
     private const CREATE_APP_URL = 'https://developer.spotify.com/dashboard/create';
 
     public function __construct(
-        private readonly SpotifyConnector $connector
+        private readonly SpotifyAuthConnector $authConnector
     ) {}
 
     public function detectExistingApps(): array
@@ -109,18 +110,9 @@ class SpotifyAppManager
     public function testAppCredentials(string $clientId, string $clientSecret): array
     {
         try {
-            $response = $this->httpClient->post('https://accounts.spotify.com/api/token', [
-                'form_params' => [
-                    'grant_type' => 'client_credentials',
-                    'client_id' => $clientId,
-                    'client_secret' => $clientSecret,
-                ],
-                'headers' => [
-                    'Content-Type' => 'application/x-www-form-urlencoded',
-                ],
-            ]);
-
-            $data = json_decode($response->getBody()->getContents(), true);
+            $request = new ClientCredentialsTokenRequest($clientId, $clientSecret);
+            $response = $this->authConnector->send($request);
+            $data = $response->json();
 
             return [
                 'valid' => true,
