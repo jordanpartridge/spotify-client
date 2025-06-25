@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh repo view:*)",
+      "Bash(gh api:*)",
+      "Bash(mkdir:*)",
+      "WebFetch(domain:developer.spotify.com)",
+      "Bash(git add:*)"
+    ],
+    "deny": []
+  }
+}
