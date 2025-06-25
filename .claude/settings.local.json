@@ -5,7 +5,9 @@
       "Bash(gh api:*)",
       "Bash(mkdir:*)",
       "WebFetch(domain:developer.spotify.com)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(git checkout:*)"
     ],
     "deny": []
   }
