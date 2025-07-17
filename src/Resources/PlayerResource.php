@@ -10,7 +10,6 @@ use Jordanpartridge\SpotifyClient\Requests\Player\PauseRequest;
 use Jordanpartridge\SpotifyClient\Requests\Player\PlayRequest;
 use Jordanpartridge\SpotifyClient\Requests\Player\PreviousRequest;
 use Jordanpartridge\SpotifyClient\Requests\Player\VolumeRequest;
-use Jordanpartridge\SpotifyClient\Resources\BaseResource;
 use Saloon\Http\Response;
 
 class PlayerResource extends BaseResource
