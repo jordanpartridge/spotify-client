@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Jordanpartridge\SpotifyClient\Services;
 
-use Jordanpartridge\SpotifyClient\SpotifyConnector;
 use Jordanpartridge\SpotifyClient\Requests\Browse\GetCategoriesRequest;
+use Jordanpartridge\SpotifyClient\SpotifyConnector;
 use Saloon\Exceptions\Request\RequestException;
 use Saloon\Http\Auth\TokenAuthenticator;
 
@@ -22,7 +22,7 @@ class CredentialValidator
         try {
             // Configure the connector with authentication
             $this->connector->authenticate(new TokenAuthenticator($tokens['access_token']));
-            
+
             $startTime = microtime(true);
             $response = $this->connector->send(new GetCategoriesRequest(1, 0));
             $responseTime = round((microtime(true) - $startTime) * 1000, 2);
@@ -47,7 +47,7 @@ class CredentialValidator
         try {
             // Configure the connector with authentication
             $this->connector->authenticate(new TokenAuthenticator($tokens['access_token']));
-            
+
             // Test with a simple API call that requires authentication
             $response = $this->connector->send(new GetCategoriesRequest(1, 0));
 
@@ -57,7 +57,7 @@ class CredentialValidator
                 'token_info' => [
                     'token_type' => $tokens['token_type'] ?? 'Bearer',
                     'expires_at' => $tokens['expires_at'] ?? null,
-                    'has_refresh_token' => !empty($tokens['refresh_token']),
+                    'has_refresh_token' => ! empty($tokens['refresh_token']),
                 ],
             ];
 
@@ -86,7 +86,7 @@ class CredentialValidator
 
         foreach ($scopeTests as $scope => $endpoint) {
             try {
-                $response = $this->httpClient->get(self::SPOTIFY_API_BASE . $endpoint, [
+                $response = $this->httpClient->get(self::SPOTIFY_API_BASE.$endpoint, [
                     'headers' => [
                         'Authorization' => "Bearer {$tokens['access_token']}",
                     ],
@@ -109,7 +109,7 @@ class CredentialValidator
 
         return [
             'success' => $successCount > 0,
-            'message' => "Verified {$successCount}/" . count($scopeTests) . " scopes",
+            'message' => "Verified {$successCount}/".count($scopeTests).' scopes',
             'scope_results' => $results,
         ];
     }
@@ -118,17 +118,17 @@ class CredentialValidator
     {
         try {
             $startTime = microtime(true);
-            
+
             // Make multiple requests to test rate limiting behavior
             $responses = [];
             for ($i = 0; $i < 5; $i++) {
-                $response = $this->httpClient->get(self::SPOTIFY_API_BASE . '/browse/categories', [
+                $response = $this->httpClient->get(self::SPOTIFY_API_BASE.'/browse/categories', [
                     'headers' => [
                         'Authorization' => "Bearer {$tokens['access_token']}",
                     ],
                     'query' => ['limit' => 1, 'offset' => $i],
                 ]);
-                
+
                 $responses[] = [
                     'status' => $response->getStatusCode(),
                     'rate_limit_remaining' => $response->getHeader('X-RateLimit-Remaining')[0] ?? null,
@@ -180,7 +180,7 @@ class CredentialValidator
 
         foreach ($errorTests as $testName => $test) {
             try {
-                $this->httpClient->get(self::SPOTIFY_API_BASE . $test['url'], [
+                $this->httpClient->get(self::SPOTIFY_API_BASE.$test['url'], [
                     'headers' => [
                         'Authorization' => "Bearer {$tokens['access_token']}",
                     ],
@@ -195,7 +195,7 @@ class CredentialValidator
             } catch (RequestException $e) {
                 $actualStatus = $e->getCode();
                 $expectedStatus = $test['expected_status'];
-                
+
                 $success = $actualStatus === $expectedStatus;
                 if ($success) {
                     $successCount++;
@@ -203,7 +203,7 @@ class CredentialValidator
 
                 $results[$testName] = [
                     'success' => $success,
-                    'message' => $success 
+                    'message' => $success
                         ? "Correct error handling (HTTP {$actualStatus})"
                         : "Expected HTTP {$expectedStatus}, got HTTP {$actualStatus}",
                 ];
@@ -212,7 +212,7 @@ class CredentialValidator
 
         return [
             'success' => $successCount === count($errorTests),
-            'message' => "Error handling: {$successCount}/" . count($errorTests) . " tests passed",
+            'message' => "Error handling: {$successCount}/".count($errorTests).' tests passed',
             'error_tests' => $results,
         ];
     }
@@ -220,8 +220,8 @@ class CredentialValidator
     public function validateTokenExpiration(array $tokens): array
     {
         $expiresAt = $tokens['expires_at'] ?? null;
-        
-        if (!$expiresAt) {
+
+        if (! $expiresAt) {
             return [
                 'success' => false,
                 'message' => 'No expiration time found in token',
@@ -258,7 +258,7 @@ class CredentialValidator
             'token_expiration' => $this->validateTokenExpiration($tokens),
         ];
 
-        $passedTests = array_filter($tests, fn($test) => $test['success']);
+        $passedTests = array_filter($tests, fn ($test) => $test['success']);
         $totalTests = count($tests);
         $passedCount = count($passedTests);
 
@@ -274,13 +274,13 @@ class CredentialValidator
     private function measureResponseTime(callable $request): float
     {
         $startTime = microtime(true);
-        
+
         try {
             $request();
         } catch (\Exception $e) {
             // Ignore exceptions for timing purposes
         }
-        
+
         return round((microtime(true) - $startTime) * 1000, 2); // Convert to milliseconds
     }
 
@@ -316,14 +316,14 @@ class CredentialValidator
             403 => 'Scope not granted or insufficient permissions',
             401 => 'Authentication required for this scope',
             404 => 'Resource not found (may require different scope)',
-            default => 'Scope test failed: ' . $e->getMessage(),
+            default => 'Scope test failed: '.$e->getMessage(),
         };
     }
 
     private function extractRateLimitInfo(array $responses): array
     {
         $rateLimitInfo = [];
-        
+
         foreach ($responses as $response) {
             if ($response['rate_limit_remaining']) {
                 $rateLimitInfo[] = $response['rate_limit_remaining'];
@@ -331,9 +331,9 @@ class CredentialValidator
         }
 
         return [
-            'rate_limits_tracked' => !empty($rateLimitInfo),
+            'rate_limits_tracked' => ! empty($rateLimitInfo),
             'remaining_requests' => $rateLimitInfo[0] ?? null,
-            'rate_limit_decreasing' => count($rateLimitInfo) > 1 && 
+            'rate_limit_decreasing' => count($rateLimitInfo) > 1 &&
                 ($rateLimitInfo[0] < $rateLimitInfo[count($rateLimitInfo) - 1]),
         ];
     }
@@ -342,19 +342,19 @@ class CredentialValidator
     {
         $recommendations = [];
 
-        if (!$tests['connection']['success']) {
+        if (! $tests['connection']['success']) {
             $recommendations[] = 'Fix network connectivity issues before proceeding';
         }
 
-        if (!$tests['authentication']['success']) {
+        if (! $tests['authentication']['success']) {
             $recommendations[] = 'Verify and regenerate your Spotify app credentials';
         }
 
-        if (!$tests['scopes']['success']) {
+        if (! $tests['scopes']['success']) {
             $recommendations[] = 'Review and adjust your requested permission scopes';
         }
 
-        if (!$tests['token_expiration']['success']) {
+        if (! $tests['token_expiration']['success']) {
             $recommendations[] = 'Implement token refresh logic for long-running applications';
         }
 

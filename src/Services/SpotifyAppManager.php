@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Jordanpartridge\SpotifyClient\Services;
 
-use Jordanpartridge\SpotifyClient\Auth\SpotifyAuthConnector;
 use Jordanpartridge\SpotifyClient\Auth\Requests\ClientCredentialsTokenRequest;
+use Jordanpartridge\SpotifyClient\Auth\SpotifyAuthConnector;
 use Saloon\Exceptions\Request\RequestException;
 
 class SpotifyAppManager
 {
     private const DEVELOPER_DASHBOARD_URL = 'https://developer.spotify.com/dashboard/applications';
+
     private const CREATE_APP_URL = 'https://developer.spotify.com/dashboard/create';
 
     public function __construct(
@@ -22,12 +23,12 @@ class SpotifyAppManager
         // Note: Spotify doesn't provide a public API to list user's apps
         // This would require web scraping or user providing app details
         // For now, we'll simulate this or ask user to provide manually
-        
+
         // In a real implementation, you might:
         // 1. Use Spotify's undocumented endpoints (risky)
         // 2. Ask user to export app list
         // 3. Store previously created apps locally
-        
+
         return $this->getLocallyStoredApps();
     }
 
@@ -205,7 +206,7 @@ class SpotifyAppManager
     private function generateRedirectUris(string $appUrl): array
     {
         $baseUrl = rtrim($appUrl, '/');
-        
+
         return [
             "{$baseUrl}/auth/spotify/callback",
             "{$baseUrl}/spotify/callback",
@@ -217,19 +218,19 @@ class SpotifyAppManager
     private function getAppsStoragePath(): string
     {
         $storageDir = storage_path('spotify-client');
-        
-        if (!is_dir($storageDir)) {
+
+        if (! is_dir($storageDir)) {
             mkdir($storageDir, 0755, true);
         }
 
-        return $storageDir . '/apps.json';
+        return $storageDir.'/apps.json';
     }
 
     private function getLocallyStoredApps(): array
     {
         $appsFile = $this->getAppsStoragePath();
-        
-        if (!file_exists($appsFile)) {
+
+        if (! file_exists($appsFile)) {
             return [];
         }
 

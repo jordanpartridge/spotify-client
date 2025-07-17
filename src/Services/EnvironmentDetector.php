@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Jordanpartridge\SpotifyClient\Services;
 
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Str;
 
 class EnvironmentDetector
 {
@@ -29,7 +28,7 @@ class EnvironmentDetector
 
     public function detectLaravelVersion(): ?string
     {
-        if (!function_exists('app')) {
+        if (! function_exists('app')) {
             return null;
         }
 
@@ -61,7 +60,7 @@ class EnvironmentDetector
         $packages = [];
         $composerLock = $this->getComposerLockContent();
 
-        if (!$composerLock) {
+        if (! $composerLock) {
             return $packages;
         }
 
@@ -106,7 +105,7 @@ class EnvironmentDetector
     {
         $appType = $this->analysis['app_type'] ?? $this->detectAppType();
 
-        return match($appType) {
+        return match ($appType) {
             'api-only' => 'client_credentials',
             'spa' => 'authorization_code',
             'web-app' => 'authorization_code',
@@ -117,7 +116,7 @@ class EnvironmentDetector
     public function suggestAppName(): string
     {
         $appName = $this->getAppName();
-        
+
         if ($appName && $appName !== 'Laravel') {
             return "{$appName} Spotify Integration";
         }
@@ -156,14 +155,14 @@ class EnvironmentDetector
     public function backupEnvironment(): void
     {
         $envPath = base_path('.env');
-        
-        if (!File::exists($envPath)) {
+
+        if (! File::exists($envPath)) {
             return;
         }
 
         $timestamp = now()->format('Y-m-d-H-i-s');
         $backupPath = base_path(".env.backup.{$timestamp}");
-        
+
         File::copy($envPath, $backupPath);
 
         // Add backup files to .gitignore if not present
@@ -193,12 +192,12 @@ class EnvironmentDetector
         $envContent = preg_replace('/\n\n+/', "\n\n", $envContent);
 
         // Add new credentials at the end
-        if (!str_ends_with($envContent, "\n")) {
+        if (! str_ends_with($envContent, "\n")) {
             $envContent .= "\n";
         }
 
         $envContent .= "\n# Spotify API Configuration\n";
-        $envContent .= implode("\n", $credentialLines) . "\n";
+        $envContent .= implode("\n", $credentialLines)."\n";
 
         File::put($envPath, $envContent);
     }
@@ -218,7 +217,7 @@ class EnvironmentDetector
     public function applySecurity(): void
     {
         $envPath = base_path('.env');
-        
+
         if (File::exists($envPath)) {
             // Ensure .env is not world-readable
             chmod($envPath, 0640);
@@ -235,19 +234,19 @@ class EnvironmentDetector
 
     public function hasIntegrations(): bool
     {
-        return !empty($this->suggestIntegrations());
+        return ! empty($this->suggestIntegrations());
     }
 
     private function isApiOnly(): bool
     {
         // Check if web routes are minimal
         $webRoutesPath = base_path('routes/web.php');
-        if (!File::exists($webRoutesPath)) {
+        if (! File::exists($webRoutesPath)) {
             return true;
         }
 
         $webRoutes = File::get($webRoutesPath);
-        
+
         // Check for minimal web routes (just welcome route)
         $routeCount = substr_count($webRoutes, 'Route::');
         if ($routeCount <= 1) {
@@ -259,6 +258,7 @@ class EnvironmentDetector
         if (File::exists($apiRoutesPath)) {
             $apiRoutes = File::get($apiRoutesPath);
             $apiRouteCount = substr_count($apiRoutes, 'Route::');
+
             return $apiRouteCount > $routeCount;
         }
 
@@ -268,7 +268,7 @@ class EnvironmentDetector
     private function isSpa(): bool
     {
         $packages = $this->detectInstalledPackages();
-        
+
         // Check for SPA frameworks
         if (in_array('Inertia.js', $packages)) {
             return true;
@@ -283,8 +283,8 @@ class EnvironmentDetector
                 $packageJson['devDependencies'] ?? []
             );
 
-            return isset($dependencies['vue']) || 
-                   isset($dependencies['react']) || 
+            return isset($dependencies['vue']) ||
+                   isset($dependencies['react']) ||
                    isset($dependencies['@inertiajs/inertia']);
         }
 
@@ -297,6 +297,7 @@ class EnvironmentDetector
         $viewsPath = base_path('resources/views');
         if (File::exists($viewsPath)) {
             $viewFiles = File::allFiles($viewsPath);
+
             return count($viewFiles) > 1; // More than just welcome.blade.php
         }
 
@@ -306,8 +307,8 @@ class EnvironmentDetector
     private function getComposerLockContent(): ?array
     {
         $composerLockPath = base_path('composer.lock');
-        
-        if (!File::exists($composerLockPath)) {
+
+        if (! File::exists($composerLockPath)) {
             return null;
         }
 
@@ -333,8 +334,8 @@ class EnvironmentDetector
     private function analyzeEnvStructure(): array
     {
         $envPath = base_path('.env');
-        
-        if (!File::exists($envPath)) {
+
+        if (! File::exists($envPath)) {
             return ['exists' => false];
         }
 
@@ -384,7 +385,7 @@ class EnvironmentDetector
         // Try to detect user's country/market
         // This is a simplified version - in reality you might use IP geolocation
         $timezone = config('app.timezone');
-        
+
         $timezoneToMarket = [
             'America/New_York' => 'US',
             'America/Chicago' => 'US',
@@ -415,10 +416,10 @@ class EnvironmentDetector
             $envContent = preg_replace("/^{$key}=.*$/m", $line, $envContent);
         } else {
             // Add new line
-            if (!str_ends_with($envContent, "\n")) {
+            if (! str_ends_with($envContent, "\n")) {
                 $envContent .= "\n";
             }
-            $envContent .= $line . "\n";
+            $envContent .= $line."\n";
         }
 
         File::put($envPath, $envContent);
@@ -431,16 +432,16 @@ class EnvironmentDetector
 
         $newPatterns = [];
         foreach ($patterns as $pattern) {
-            if (!str_contains($gitignoreContent, $pattern)) {
+            if (! str_contains($gitignoreContent, $pattern)) {
                 $newPatterns[] = $pattern;
             }
         }
 
-        if (!empty($newPatterns)) {
-            if (!str_ends_with($gitignoreContent, "\n")) {
+        if (! empty($newPatterns)) {
+            if (! str_ends_with($gitignoreContent, "\n")) {
                 $gitignoreContent .= "\n";
             }
-            $gitignoreContent .= implode("\n", $newPatterns) . "\n";
+            $gitignoreContent .= implode("\n", $newPatterns)."\n";
             File::put($gitignorePath, $gitignoreContent);
         }
     }
