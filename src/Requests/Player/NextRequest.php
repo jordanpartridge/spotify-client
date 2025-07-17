@@ -6,7 +6,6 @@ namespace Jordanpartridge\SpotifyClient\Requests\Player;
 
 use Jordanpartridge\SpotifyClient\Requests\BaseRequest;
 use Saloon\Enums\Method;
-use Saloon\Http\Request;
 
 class NextRequest extends BaseRequest
 {
