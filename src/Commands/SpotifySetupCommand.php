@@ -10,7 +10,7 @@ class SpotifySetupCommand extends Command
 {
     protected $signature = 'spotify:setup';
 
-    protected $description = 'Set up Spotify integration (alias for spotify-client:install)';
+    protected $description = 'Set up Spotify integration (alias for spotify:install)';
 
     public function handle(): int
     {

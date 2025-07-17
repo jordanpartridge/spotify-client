@@ -319,19 +319,19 @@ if ($this->detectCommonIssue()) {
 ### Update Command
 ```bash
 # Smart updates for existing installations
-php artisan spotify-client:update
+php artisan spotify:update
 ```
 
 ### Diagnostic Command
 ```bash
 # Comprehensive troubleshooting
-php artisan spotify-client:doctor
+php artisan spotify:doctor
 ```
 
 ### Demo Mode
 ```bash
 # Generate sample data and examples
-php artisan spotify-client:demo
+php artisan spotify:demo
 ```
 
 ## Technical Implementation Notes
