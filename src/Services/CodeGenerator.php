@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Jordanpartridge\SpotifyClient\Services;
 
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Str;
 
 class CodeGenerator
 {
@@ -16,26 +15,26 @@ class CodeGenerator
     public function generateExamples(): void
     {
         $analysis = $this->environmentDetector->analyzeEnvironment();
-        
+
         $this->createExamplesDirectory();
         $this->generateBasicController();
         $this->generateApiController();
-        
+
         if (in_array('Livewire', $analysis['packages'])) {
             $this->generateLivewireComponent();
         }
-        
+
         if (in_array('Inertia.js', $analysis['packages'])) {
             $this->generateInertiaController();
         }
-        
+
         $this->generateUsageDocumentation($analysis);
         $this->generateRouteExamples($analysis);
     }
 
     public function generateIntegration(string $integration): void
     {
-        match($integration) {
+        match ($integration) {
             'livewire' => $this->generateLivewireComponent(),
             'inertia' => $this->generateInertiaController(),
             'filament' => $this->generateFilamentResource(),
@@ -48,8 +47,8 @@ class CodeGenerator
     private function createExamplesDirectory(): void
     {
         $examplesPath = base_path('spotify-examples');
-        
-        if (!File::exists($examplesPath)) {
+
+        if (! File::exists($examplesPath)) {
             File::makeDirectory($examplesPath, 0755, true);
         }
     }
@@ -77,7 +76,7 @@ class CodeGenerator
         ], true);
 
         $apiDir = base_path('spotify-examples/Api');
-        if (!File::exists($apiDir)) {
+        if (! File::exists($apiDir)) {
             File::makeDirectory($apiDir, 0755, true);
         }
 
@@ -281,7 +280,7 @@ PHP;
     {
         $appName = $analysis['app_name'] ?? 'Your Laravel App';
         $packages = implode(', ', $analysis['packages']);
-        
+
         $documentation = <<<MD
 # Spotify Integration for {$appName}
 
@@ -337,7 +336,7 @@ MD;
             $documentation .= "\n- `SpotifyInertiaController.php` - Inertia.js integration examples";
         }
 
-        $documentation .= <<<MD
+        $documentation .= <<<'MD'
 
 ## Next Steps
 
@@ -423,7 +422,7 @@ PHP;
     {
         $namespace = $isApi ? 'App\Http\Controllers\Api' : 'App\Http\Controllers';
         $use = $isApi ? 'use Illuminate\Http\JsonResponse;' : '';
-        
+
         $methodsCode = implode("\n\n", array_values($methods));
 
         return <<<PHP

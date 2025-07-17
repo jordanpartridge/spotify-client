@@ -4,24 +4,27 @@ declare(strict_types=1);
 
 namespace Jordanpartridge\SpotifyClient\Services;
 
-use Jordanpartridge\SpotifyClient\Auth\SpotifyAuthConnector;
-use Jordanpartridge\SpotifyClient\Auth\Requests\ClientCredentialsTokenRequest;
 use Jordanpartridge\SpotifyClient\Auth\Requests\AuthorizationCodeTokenRequest;
+use Jordanpartridge\SpotifyClient\Auth\Requests\ClientCredentialsTokenRequest;
 use Jordanpartridge\SpotifyClient\Auth\Requests\RefreshTokenRequest;
-use Saloon\Exceptions\Request\RequestException;
+use Jordanpartridge\SpotifyClient\Auth\SpotifyAuthConnector;
+use Psr\Http\Message\ServerRequestInterface;
 use React\EventLoop\Loop;
 use React\Http\HttpServer;
 use React\Http\Message\Response;
 use React\Socket\SocketServer;
-use Psr\Http\Message\ServerRequestInterface;
+use Saloon\Exceptions\Request\RequestException;
 
 class OAuthFlowHandler
 {
     private const SPOTIFY_AUTH_URL = 'https://accounts.spotify.com/authorize';
+
     private const SPOTIFY_TOKEN_URL = 'https://accounts.spotify.com/api/token';
-    
+
     private ?string $authorizationCode = null;
+
     private ?string $state = null;
+
     private ?array $tokens = null;
 
     public function __construct(
@@ -50,7 +53,7 @@ class OAuthFlowHandler
     public function generateAuthorizationUrl(string $clientId, string $redirectUri, array $scopes): string
     {
         $this->state = bin2hex(random_bytes(16));
-        
+
         $params = [
             'client_id' => $clientId,
             'response_type' => 'code',
@@ -60,7 +63,7 @@ class OAuthFlowHandler
             'show_dialog' => 'true', // Force user to see auth dialog
         ];
 
-        return self::SPOTIFY_AUTH_URL . '?' . http_build_query($params);
+        return self::SPOTIFY_AUTH_URL.'?'.http_build_query($params);
     }
 
     public function generateAuthorizationUrlWithPKCE(string $clientId, string $redirectUri, array $scopes): array
@@ -81,7 +84,7 @@ class OAuthFlowHandler
         ];
 
         return [
-            'url' => self::SPOTIFY_AUTH_URL . '?' . http_build_query($params),
+            'url' => self::SPOTIFY_AUTH_URL.'?'.http_build_query($params),
             'code_verifier' => $codeVerifier,
             'state' => $this->state,
         ];
@@ -90,7 +93,7 @@ class OAuthFlowHandler
     public function startCallbackServer(int $port = 8080): string
     {
         $loop = Loop::get();
-        
+
         $server = new HttpServer(function (ServerRequestInterface $request) {
             return $this->handleCallback($request);
         });
@@ -109,12 +112,12 @@ class OAuthFlowHandler
     public function waitForCallback(array $appConfig, int $timeoutSeconds = 120): array
     {
         $startTime = time();
-        
+
         while (time() - $startTime < $timeoutSeconds) {
             if ($this->authorizationCode) {
                 return $this->exchangeCodeForTokens($appConfig);
             }
-            
+
             usleep(100000); // Sleep for 100ms
         }
 
@@ -123,7 +126,7 @@ class OAuthFlowHandler
 
     public function exchangeCodeForTokens(array $appConfig): array
     {
-        if (!$this->authorizationCode) {
+        if (! $this->authorizationCode) {
             throw new \Exception('No authorization code available');
         }
 
@@ -134,7 +137,7 @@ class OAuthFlowHandler
                 $appConfig['client_id'],
                 $appConfig['client_secret']
             );
-            
+
             $response = $this->authConnector->send($request);
             $data = $response->json();
 
@@ -162,7 +165,7 @@ class OAuthFlowHandler
                 $appConfig['client_id'],
                 $appConfig['client_secret']
             );
-            
+
             $response = $this->authConnector->send($request);
             $data = $response->json();
 
@@ -190,7 +193,7 @@ class OAuthFlowHandler
         };
 
         if ($command) {
-            exec($command . ' > /dev/null 2>&1 &');
+            exec($command.' > /dev/null 2>&1 &');
         }
     }
 
@@ -202,15 +205,15 @@ class OAuthFlowHandler
     private function handleCallback(ServerRequestInterface $request): Response
     {
         $query = $request->getQueryParams();
-        
+
         // Handle authorization response
         if (isset($query['code']) && isset($query['state'])) {
-            if (!$this->validateState($query['state'])) {
+            if (! $this->validateState($query['state'])) {
                 return new Response(400, [], $this->generateErrorPage('Invalid state parameter'));
             }
 
             $this->authorizationCode = $query['code'];
-            
+
             return new Response(200, [], $this->generateSuccessPage());
         }
 
@@ -218,7 +221,7 @@ class OAuthFlowHandler
         if (isset($query['error'])) {
             $error = $query['error'];
             $description = $query['error_description'] ?? 'Unknown error';
-            
+
             return new Response(400, [], $this->generateErrorPage("Authorization failed: {$error} - {$description}"));
         }
 

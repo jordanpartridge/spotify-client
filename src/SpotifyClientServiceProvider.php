@@ -6,12 +6,13 @@ namespace Jordanpartridge\SpotifyClient;
 
 use Jordanpartridge\SpotifyClient\Auth\SpotifyAuthConnector;
 use Jordanpartridge\SpotifyClient\Commands\SpotifyInstallCommand;
+use Jordanpartridge\SpotifyClient\Commands\SpotifySetupCommand;
 use Jordanpartridge\SpotifyClient\Contracts\SpotifyClientInterface;
+use Jordanpartridge\SpotifyClient\Services\CodeGenerator;
 use Jordanpartridge\SpotifyClient\Services\CredentialValidator;
 use Jordanpartridge\SpotifyClient\Services\EnvironmentDetector;
 use Jordanpartridge\SpotifyClient\Services\OAuthFlowHandler;
 use Jordanpartridge\SpotifyClient\Services\SpotifyAppManager;
-use Jordanpartridge\SpotifyClient\Services\CodeGenerator;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -22,18 +23,19 @@ class SpotifyClientServiceProvider extends PackageServiceProvider
         $package
             ->name('spotify-client')
             ->hasConfigFile()
-            ->hasCommand(SpotifyInstallCommand::class);
+            ->hasCommand(SpotifyInstallCommand::class)
+            ->hasCommand(SpotifySetupCommand::class);
     }
 
     public function packageRegistered(): void
     {
         // Register core services
         $this->app->singleton(SpotifyConnector::class, function () {
-            return new SpotifyConnector();
+            return new SpotifyConnector;
         });
 
         $this->app->singleton(SpotifyAuthConnector::class, function () {
-            return new SpotifyAuthConnector();
+            return new SpotifyAuthConnector;
         });
 
         $this->app->singleton(SpotifyClientInterface::class, function ($app) {

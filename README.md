@@ -27,7 +27,9 @@ composer require jordanpartridge/spotify-client
 Then run our fancy install command that'll set you up proper:
 
 ```bash
-php artisan spotify-client:install
+php artisan spotify:install
+# or use the setup alias
+php artisan spotify:setup
 ```
 
 *That command's gonna open your browser, help you register your app*  
