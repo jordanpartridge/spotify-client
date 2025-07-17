@@ -6,6 +6,7 @@ namespace Jordanpartridge\SpotifyClient;
 
 use Jordanpartridge\SpotifyClient\Resources\AlbumsResource;
 use Jordanpartridge\SpotifyClient\Resources\ArtistsResource;
+use Jordanpartridge\SpotifyClient\Resources\DevicesResource;
 use Jordanpartridge\SpotifyClient\Resources\PlayerResource;
 use Jordanpartridge\SpotifyClient\Resources\PlaylistsResource;
 use Jordanpartridge\SpotifyClient\Resources\SearchResource;
@@ -66,5 +67,10 @@ class SpotifyConnector extends Connector
     public function search(): SearchResource
     {
         return new SearchResource($this);
+    }
+
+    public function devices(): DevicesResource
+    {
+        return new DevicesResource($this);
     }
 }

@@ -6,6 +6,7 @@ namespace Jordanpartridge\SpotifyClient\Contracts;
 
 use Jordanpartridge\SpotifyClient\Resources\AlbumsResource;
 use Jordanpartridge\SpotifyClient\Resources\ArtistsResource;
+use Jordanpartridge\SpotifyClient\Resources\DevicesResource;
 use Jordanpartridge\SpotifyClient\Resources\PlayerResource;
 use Jordanpartridge\SpotifyClient\Resources\PlaylistsResource;
 use Jordanpartridge\SpotifyClient\Resources\SearchResource;
@@ -27,4 +28,6 @@ interface SpotifyClientInterface
     public function player(): PlayerResource;
 
     public function search(): SearchResource;
+
+    public function devices(): DevicesResource;
 }
