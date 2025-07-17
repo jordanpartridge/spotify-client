@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Jordanpartridge\SpotifyClient\Resources;
 
-use Jordanpartridge\SpotifyClient\Requests\Search\SearchAllRequest;
 use Jordanpartridge\SpotifyClient\Requests\Search\SearchAlbumsRequest;
+use Jordanpartridge\SpotifyClient\Requests\Search\SearchAllRequest;
 use Jordanpartridge\SpotifyClient\Requests\Search\SearchArtistsRequest;
 use Jordanpartridge\SpotifyClient\Requests\Search\SearchPlaylistsRequest;
 use Jordanpartridge\SpotifyClient\Requests\Search\SearchRequest;
@@ -16,9 +16,13 @@ use Saloon\Http\Response;
 class SearchResource extends BaseResource
 {
     private string $query = '';
+
     private ?string $market = null;
+
     private int $limit = 20;
+
     private int $offset = 0;
+
     private bool $includeExternal = false;
 
     /**
@@ -27,6 +31,7 @@ class SearchResource extends BaseResource
     public function query(string $query): self
     {
         $this->query = $query;
+
         return $this;
     }
 
@@ -36,6 +41,7 @@ class SearchResource extends BaseResource
     public function market(string $market): self
     {
         $this->market = $market;
+
         return $this;
     }
 
@@ -45,6 +51,7 @@ class SearchResource extends BaseResource
     public function limit(int $limit): self
     {
         $this->limit = min(50, max(1, $limit)); // Spotify API limits: 1-50
+
         return $this;
     }
 
@@ -54,6 +61,7 @@ class SearchResource extends BaseResource
     public function offset(int $offset): self
     {
         $this->offset = max(0, $offset);
+
         return $this;
     }
 
@@ -63,15 +71,17 @@ class SearchResource extends BaseResource
     public function includeExternal(bool $include = true): self
     {
         $this->includeExternal = $include;
+
         return $this;
     }
 
     /**
      * Search for tracks only.
      */
-    public function tracks(string $query = null): Response
+    public function tracks(?string $query = null): Response
     {
         $searchQuery = $query ?? $this->query;
+
         return $this->connector->send(
             new SearchTracksRequest(
                 $searchQuery,
@@ -86,9 +96,10 @@ class SearchResource extends BaseResource
     /**
      * Search for albums only.
      */
-    public function albums(string $query = null): Response
+    public function albums(?string $query = null): Response
     {
         $searchQuery = $query ?? $this->query;
+
         return $this->connector->send(
             new SearchAlbumsRequest(
                 $searchQuery,
@@ -103,9 +114,10 @@ class SearchResource extends BaseResource
     /**
      * Search for artists only.
      */
-    public function artists(string $query = null): Response
+    public function artists(?string $query = null): Response
     {
         $searchQuery = $query ?? $this->query;
+
         return $this->connector->send(
             new SearchArtistsRequest(
                 $searchQuery,
@@ -120,9 +132,10 @@ class SearchResource extends BaseResource
     /**
      * Search for playlists only.
      */
-    public function playlists(string $query = null): Response
+    public function playlists(?string $query = null): Response
     {
         $searchQuery = $query ?? $this->query;
+
         return $this->connector->send(
             new SearchPlaylistsRequest(
                 $searchQuery,
@@ -137,9 +150,10 @@ class SearchResource extends BaseResource
     /**
      * Search across all content types.
      */
-    public function all(string $query = null): Response
+    public function all(?string $query = null): Response
     {
         $searchQuery = $query ?? $this->query;
+
         return $this->connector->send(
             new SearchAllRequest(
                 $searchQuery,
@@ -154,9 +168,10 @@ class SearchResource extends BaseResource
     /**
      * Search with custom types.
      */
-    public function custom(array $types, string $query = null): Response
+    public function custom(array $types, ?string $query = null): Response
     {
         $searchQuery = $query ?? $this->query;
+
         return $this->connector->send(
             new SearchRequest(
                 $searchQuery,
@@ -176,7 +191,7 @@ class SearchResource extends BaseResource
     {
         $response = $this->limit(1)->tracks($query);
         $data = $response->json();
-        
+
         return $data['tracks']['items'][0] ?? null;
     }
 
@@ -186,6 +201,7 @@ class SearchResource extends BaseResource
     public function getFirstTrackUri(string $query): ?string
     {
         $track = $this->firstTrack($query);
+
         return $track['uri'] ?? null;
     }
 }

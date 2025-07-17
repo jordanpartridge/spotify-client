@@ -6,7 +6,6 @@ namespace Jordanpartridge\SpotifyClient\Requests\Search;
 
 use Jordanpartridge\SpotifyClient\Requests\BaseRequest;
 use Saloon\Enums\Method;
-use Saloon\Http\Request;
 
 class SearchRequest extends BaseRequest
 {
