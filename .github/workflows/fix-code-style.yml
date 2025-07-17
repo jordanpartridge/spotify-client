@@ -1,0 +1,42 @@
+name: Fix Code Style
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+
+jobs:
+  fix-code-style:
+    runs-on: ubuntu-latest
+    name: Fix Code Style
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        ref: ${{ github.head_ref }}
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 8.3
+        extensions: dom, curl, libxml, mbstring, zip
+
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-interaction --no-progress
+
+    - name: Run Pint (fix code style)
+      run: composer run format
+
+    - name: Commit changes
+      uses: stefanzweifel/git-auto-commit-action@v5
+      with:
+        commit_message: 'style: fix code style with Laravel Pint'
+        commit_options: '--no-verify --signoff'
+        file_pattern: '*.php'
+        commit_user_name: 'github-actions[bot]'
+        commit_user_email: 'github-actions[bot]@users.noreply.github.com'
+        commit_author: 'github-actions[bot] <github-actions[bot]@users.noreply.github.com>'

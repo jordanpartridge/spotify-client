@@ -15,7 +15,7 @@ use function Laravel\Prompts\{intro, outro, info, warning, error, confirm, selec
 
 class SpotifyInstallCommand extends Command
 {
-    protected $signature = 'spotify-client:install';
+    protected $signature = 'spotify:install';
 
     protected $description = 'Set up Spotify API integration with zero manual steps - the most developer-friendly setup experience ever built';
 

@@ -6,6 +6,7 @@ namespace Jordanpartridge\SpotifyClient;
 
 use Jordanpartridge\SpotifyClient\Auth\SpotifyAuthConnector;
 use Jordanpartridge\SpotifyClient\Commands\SpotifyInstallCommand;
+use Jordanpartridge\SpotifyClient\Commands\SpotifySetupCommand;
 use Jordanpartridge\SpotifyClient\Contracts\SpotifyClientInterface;
 use Jordanpartridge\SpotifyClient\Services\CredentialValidator;
 use Jordanpartridge\SpotifyClient\Services\EnvironmentDetector;
@@ -22,7 +23,8 @@ class SpotifyClientServiceProvider extends PackageServiceProvider
         $package
             ->name('spotify-client')
             ->hasConfigFile()
-            ->hasCommand(SpotifyInstallCommand::class);
+            ->hasCommand(SpotifyInstallCommand::class)
+            ->hasCommand(SpotifySetupCommand::class);
     }
 
     public function packageRegistered(): void
