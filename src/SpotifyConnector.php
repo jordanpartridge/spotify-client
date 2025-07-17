@@ -8,6 +8,7 @@ use Jordanpartridge\SpotifyClient\Resources\AlbumsResource;
 use Jordanpartridge\SpotifyClient\Resources\ArtistsResource;
 use Jordanpartridge\SpotifyClient\Resources\PlayerResource;
 use Jordanpartridge\SpotifyClient\Resources\PlaylistsResource;
+use Jordanpartridge\SpotifyClient\Resources\SearchResource;
 use Jordanpartridge\SpotifyClient\Resources\TracksResource;
 use Jordanpartridge\SpotifyClient\Resources\UsersResource;
 use Saloon\Http\Connector;
@@ -60,5 +61,10 @@ class SpotifyConnector extends Connector
     public function player(): PlayerResource
     {
         return new PlayerResource($this);
+    }
+
+    public function search(): SearchResource
+    {
+        return new SearchResource($this);
     }
 }
