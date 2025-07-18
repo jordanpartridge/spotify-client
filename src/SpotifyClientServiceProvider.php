@@ -86,9 +86,20 @@ class SpotifyClientServiceProvider extends PackageServiceProvider
         return match ($driver) {
             'file' => new FileTokenStorage(
                 $this->app->make(Filesystem::class),
-                config('spotify-client.auth.token_storage.path', storage_path('app/spotify-tokens.json'))
+                config('spotify-client.auth.token_storage.path', $this->getDefaultTokenStoragePath())
             ),
             default => throw new \InvalidArgumentException("Unsupported token storage driver: {$driver}")
         };
+    }
+
+    private function getDefaultTokenStoragePath(): string
+    {
+        // Check if we're in a Laravel application context
+        if (function_exists('storage_path')) {
+            return storage_path('app/spotify-tokens.json');
+        }
+
+        // Fallback for package development or non-Laravel environments
+        return sys_get_temp_dir().'/spotify-tokens.json';
     }
 }

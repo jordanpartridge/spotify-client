@@ -62,11 +62,23 @@ return [
         'redirect_uri' => env('SPOTIFY_REDIRECT_URI', 'http://localhost:8000/callback'),
 
         /*
+        | OAuth callback server configuration
+        | Used for local development OAuth flows
+        */
+        'callback_server' => [
+            'host' => env('SPOTIFY_CALLBACK_HOST', '127.0.0.1'),
+            'port' => env('SPOTIFY_CALLBACK_PORT', 8080),
+        ],
+
+        /*
         | Token storage configuration
         */
         'token_storage' => [
             'driver' => env('SPOTIFY_TOKEN_STORAGE', 'file'),
-            'path' => storage_path('spotify-tokens.json'),
+            'path' => env('SPOTIFY_TOKEN_STORAGE_PATH', function_exists('storage_path')
+                ? storage_path('spotify-tokens.json')
+                : sys_get_temp_dir().'/spotify-tokens.json'
+            ),
         ],
     ],
 

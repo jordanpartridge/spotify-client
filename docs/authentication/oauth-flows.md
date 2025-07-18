@@ -89,7 +89,7 @@ public function validateState(string $receivedState): bool
 For CLI applications, we run a local HTTP server to capture OAuth callbacks:
 
 ```php
-public function startCallbackServer(int $port = 8080): string
+public function startCallbackServer(int $port = 8080, string $host = '127.0.0.1'): string
 {
     $loop = Loop::get();
     
@@ -97,10 +97,13 @@ public function startCallbackServer(int $port = 8080): string
         return $this->handleCallback($request);
     });
 
-    $socket = new SocketServer("127.0.0.1:{$port}", [], $loop);
+    $socket = new SocketServer("{$host}:{$port}", [], $loop);
     $server->listen($socket);
 
-    return "http://localhost:{$port}/callback";
+    // Store the redirect URI for consistent token exchange
+    $this->redirectUri = "http://{$host}:{$port}/callback";
+
+    return $this->redirectUri;
 }
 ```
 
