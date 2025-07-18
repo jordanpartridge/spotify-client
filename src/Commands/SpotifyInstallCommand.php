@@ -375,7 +375,9 @@ class SpotifyInstallCommand extends Command
     {
         info('Starting local OAuth server for authorization callback...');
 
-        $callbackUrl = $this->oauthHandler->startCallbackServer();
+        $host = config('spotify-client.auth.callback_server.host', '127.0.0.1');
+        $port = config('spotify-client.auth.callback_server.port', 8080);
+        $callbackUrl = $this->oauthHandler->startCallbackServer($port, $host);
 
         info("✅ OAuth server running at: {$callbackUrl}");
         info('🌐 Opening browser for Spotify authorization...');

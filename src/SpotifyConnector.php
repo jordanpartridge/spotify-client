@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jordanpartridge\SpotifyClient;
 
+use Jordanpartridge\SpotifyClient\Contracts\AuthenticatorInterface;
 use Jordanpartridge\SpotifyClient\Resources\AlbumsResource;
 use Jordanpartridge\SpotifyClient\Resources\ArtistsResource;
 use Jordanpartridge\SpotifyClient\Resources\DevicesResource;
@@ -21,6 +22,14 @@ class SpotifyConnector extends Connector
     use AcceptsJson;
     use AlwaysThrowOnErrors;
 
+    protected ?AuthenticatorInterface $spotifyAuthenticator = null;
+
+    public function __construct(
+        ?AuthenticatorInterface $authenticator = null
+    ) {
+        $this->spotifyAuthenticator = $authenticator;
+    }
+
     public function resolveBaseUrl(): string
     {
         return 'https://api.spotify.com/v1';
@@ -28,10 +37,16 @@ class SpotifyConnector extends Connector
 
     protected function defaultHeaders(): array
     {
-        return [
+        $headers = [
             'Content-Type' => 'application/json',
             'Accept' => 'application/json',
         ];
+
+        if ($this->spotifyAuthenticator) {
+            $headers['Authorization'] = 'Bearer '.$this->spotifyAuthenticator->getAccessToken();
+        }
+
+        return $headers;
     }
 
     public function albums(): AlbumsResource

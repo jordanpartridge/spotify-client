@@ -27,6 +27,8 @@ class OAuthFlowHandler
 
     private ?array $tokens = null;
 
+    private ?string $redirectUri = null;
+
     public function __construct(
         private readonly SpotifyAuthConnector $authConnector
     ) {}
@@ -53,6 +55,7 @@ class OAuthFlowHandler
     public function generateAuthorizationUrl(string $clientId, string $redirectUri, array $scopes): string
     {
         $this->state = bin2hex(random_bytes(16));
+        $this->redirectUri = $redirectUri; // Store for later use
 
         $params = [
             'client_id' => $clientId,
@@ -71,6 +74,7 @@ class OAuthFlowHandler
         $codeVerifier = $this->generateCodeVerifier();
         $codeChallenge = $this->generateCodeChallenge($codeVerifier);
         $this->state = bin2hex(random_bytes(16));
+        $this->redirectUri = $redirectUri; // Store for later use
 
         $params = [
             'client_id' => $clientId,
@@ -90,7 +94,7 @@ class OAuthFlowHandler
         ];
     }
 
-    public function startCallbackServer(int $port = 8080): string
+    public function startCallbackServer(int $port = 8080, string $host = '127.0.0.1'): string
     {
         $loop = Loop::get();
 
@@ -98,7 +102,7 @@ class OAuthFlowHandler
             return $this->handleCallback($request);
         });
 
-        $socket = new SocketServer("127.0.0.1:{$port}", [], $loop);
+        $socket = new SocketServer("{$host}:{$port}", [], $loop);
         $server->listen($socket);
 
         // Start the event loop in a non-blocking way
@@ -106,7 +110,10 @@ class OAuthFlowHandler
             $loop->run();
         });
 
-        return "http://localhost:{$port}/callback";
+        // Store the redirect URI for later use and ensure consistent format
+        $this->redirectUri = "http://{$host}:{$port}/callback";
+
+        return $this->redirectUri;
     }
 
     public function waitForCallback(array $appConfig, int $timeoutSeconds = 120): array
@@ -130,10 +137,14 @@ class OAuthFlowHandler
             throw new \Exception('No authorization code available');
         }
 
+        if (! $this->redirectUri) {
+            throw new \Exception('No redirect URI available. Make sure to call startCallbackServer() first.');
+        }
+
         try {
             $request = new AuthorizationCodeTokenRequest(
                 $this->authorizationCode,
-                'http://localhost:8080/callback',
+                $this->redirectUri,
                 $appConfig['client_id'],
                 $appConfig['client_secret']
             );
@@ -200,6 +211,11 @@ class OAuthFlowHandler
     public function validateState(string $receivedState): bool
     {
         return $this->state && hash_equals($this->state, $receivedState);
+    }
+
+    public function getRedirectUri(): ?string
+    {
+        return $this->redirectUri;
     }
 
     private function handleCallback(ServerRequestInterface $request): Response

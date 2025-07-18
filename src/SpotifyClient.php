@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jordanpartridge\SpotifyClient;
 
+use Jordanpartridge\SpotifyClient\Contracts\AuthenticatorInterface;
 use Jordanpartridge\SpotifyClient\Contracts\SpotifyClientInterface;
 use Jordanpartridge\SpotifyClient\Resources\AlbumsResource;
 use Jordanpartridge\SpotifyClient\Resources\ArtistsResource;
@@ -17,7 +18,8 @@ use Jordanpartridge\SpotifyClient\Resources\UsersResource;
 class SpotifyClient implements SpotifyClientInterface
 {
     public function __construct(
-        private readonly SpotifyConnector $connector
+        private readonly SpotifyConnector $connector,
+        ?AuthenticatorInterface $authenticator = null
     ) {}
 
     public function albums(): AlbumsResource
