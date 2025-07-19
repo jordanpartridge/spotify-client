@@ -9,6 +9,7 @@ use Jordanpartridge\SpotifyClient\Contracts\SpotifyClientInterface;
 use Jordanpartridge\SpotifyClient\Resources\AlbumsResource;
 use Jordanpartridge\SpotifyClient\Resources\ArtistsResource;
 use Jordanpartridge\SpotifyClient\Resources\DevicesResource;
+use Jordanpartridge\SpotifyClient\Resources\LibraryResource;
 use Jordanpartridge\SpotifyClient\Resources\PlayerResource;
 use Jordanpartridge\SpotifyClient\Resources\PlaylistsResource;
 use Jordanpartridge\SpotifyClient\Resources\SearchResource;
@@ -60,5 +61,10 @@ class SpotifyClient implements SpotifyClientInterface
     public function devices(): DevicesResource
     {
         return $this->connector->devices();
+    }
+
+    public function library(): LibraryResource
+    {
+        return $this->connector->library();
     }
 }

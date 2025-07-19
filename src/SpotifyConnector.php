@@ -8,6 +8,7 @@ use Jordanpartridge\SpotifyClient\Contracts\AuthenticatorInterface;
 use Jordanpartridge\SpotifyClient\Resources\AlbumsResource;
 use Jordanpartridge\SpotifyClient\Resources\ArtistsResource;
 use Jordanpartridge\SpotifyClient\Resources\DevicesResource;
+use Jordanpartridge\SpotifyClient\Resources\LibraryResource;
 use Jordanpartridge\SpotifyClient\Resources\PlayerResource;
 use Jordanpartridge\SpotifyClient\Resources\PlaylistsResource;
 use Jordanpartridge\SpotifyClient\Resources\SearchResource;
@@ -87,5 +88,10 @@ class SpotifyConnector extends Connector
     public function devices(): DevicesResource
     {
         return new DevicesResource($this);
+    }
+
+    public function library(): LibraryResource
+    {
+        return new LibraryResource($this);
     }
 }

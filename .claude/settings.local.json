@@ -12,7 +12,11 @@
       "Bash(gh pr create:*)",
       "Bash(gh issue list:*)",
       "Bash(find:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(gh pr list:*)",
+      "Bash(git tag:*)",
+      "Bash(gh release:*)",
+      "Bash(gh issue:*)"
     ],
     "deny": []
   }
