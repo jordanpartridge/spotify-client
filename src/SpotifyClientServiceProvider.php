@@ -12,6 +12,7 @@ use Jordanpartridge\SpotifyClient\Commands\SpotifyInstallCommand;
 use Jordanpartridge\SpotifyClient\Commands\SpotifySetupCommand;
 use Jordanpartridge\SpotifyClient\Contracts\SpotifyClientInterface;
 use Jordanpartridge\SpotifyClient\Contracts\TokenStorageInterface;
+use Jordanpartridge\SpotifyClient\Facades\SpotifyFacade;
 use Jordanpartridge\SpotifyClient\Services\CodeGenerator;
 use Jordanpartridge\SpotifyClient\Services\CredentialValidator;
 use Jordanpartridge\SpotifyClient\Services\EnvironmentDetector;
@@ -27,6 +28,7 @@ class SpotifyClientServiceProvider extends PackageServiceProvider
         $package
             ->name('spotify-client')
             ->hasConfigFile()
+            ->hasFacade(SpotifyFacade::class, 'Spotify')
             ->hasCommand(SpotifyInstallCommand::class)
             ->hasCommand(SpotifySetupCommand::class);
     }
