@@ -8,8 +8,15 @@ use Illuminate\Filesystem\Filesystem;
 use Jordanpartridge\SpotifyClient\Auth\SpotifyAuthConnector;
 use Jordanpartridge\SpotifyClient\Auth\SpotifyAuthManager;
 use Jordanpartridge\SpotifyClient\Auth\Storage\FileTokenStorage;
-use Jordanpartridge\SpotifyClient\Commands\SpotifyInstallCommand;
-use Jordanpartridge\SpotifyClient\Commands\SpotifySetupCommand;
+use Jordanpartridge\SpotifyClient\Commands\Auth\RefreshCommand;
+use Jordanpartridge\SpotifyClient\Commands\Auth\SetupCommand as AuthSetupCommand;
+use Jordanpartridge\SpotifyClient\Commands\Auth\StatusCommand as AuthStatusCommand;
+use Jordanpartridge\SpotifyClient\Commands\InstallCommand;
+use Jordanpartridge\SpotifyClient\Commands\Library\SyncCommand;
+use Jordanpartridge\SpotifyClient\Commands\Player\PauseCommand;
+use Jordanpartridge\SpotifyClient\Commands\Player\PlayCommand;
+use Jordanpartridge\SpotifyClient\Commands\Player\StatusCommand as PlayerStatusCommand;
+use Jordanpartridge\SpotifyClient\Commands\SetupCommand;
 use Jordanpartridge\SpotifyClient\Contracts\SpotifyClientInterface;
 use Jordanpartridge\SpotifyClient\Contracts\TokenStorageInterface;
 use Jordanpartridge\SpotifyClient\Facades\SpotifyFacade;
@@ -29,8 +36,17 @@ class SpotifyClientServiceProvider extends PackageServiceProvider
             ->name('spotify-client')
             ->hasConfigFile()
             ->hasFacade(SpotifyFacade::class, 'Spotify')
-            ->hasCommand(SpotifyInstallCommand::class)
-            ->hasCommand(SpotifySetupCommand::class);
+            // Legacy commands (for backward compatibility)
+            ->hasCommand(InstallCommand::class)
+            ->hasCommand(SetupCommand::class)
+            // New organized command structure
+            ->hasCommand(AuthSetupCommand::class)
+            ->hasCommand(AuthStatusCommand::class)
+            ->hasCommand(RefreshCommand::class)
+            ->hasCommand(PlayCommand::class)
+            ->hasCommand(PauseCommand::class)
+            ->hasCommand(PlayerStatusCommand::class)
+            ->hasCommand(SyncCommand::class);
     }
 
     public function packageRegistered(): void
