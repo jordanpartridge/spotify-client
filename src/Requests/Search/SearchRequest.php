@@ -11,14 +11,22 @@ class SearchRequest extends BaseRequest
 {
     protected Method $method = Method::GET;
 
+    /**
+     * Not $query: Saloon\Http\Request already owns a $query property (the
+     * query-string store), and redeclaring it with another type is fatal.
+     */
+    private readonly string $searchQuery;
+
     public function __construct(
-        private readonly string $query,
+        string $query,
         private readonly array $types,
         private readonly ?string $market = null,
         private readonly int $limit = 20,
         private readonly int $offset = 0,
         private readonly bool $includeExternal = false
-    ) {}
+    ) {
+        $this->searchQuery = $query;
+    }
 
     public function resolveEndpoint(): string
     {
@@ -28,7 +36,7 @@ class SearchRequest extends BaseRequest
     protected function defaultQuery(): array
     {
         $query = [
-            'q' => $this->query,
+            'q' => $this->searchQuery,
             'type' => implode(',', $this->types),
             'limit' => $this->limit,
             'offset' => $this->offset,

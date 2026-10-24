@@ -271,19 +271,6 @@ class CredentialValidator
         ];
     }
 
-    private function measureResponseTime(callable $request): float
-    {
-        $startTime = microtime(true);
-
-        try {
-            $request();
-        } catch (\Exception $e) {
-            // Ignore exceptions for timing purposes
-        }
-
-        return round((microtime(true) - $startTime) * 1000, 2); // Convert to milliseconds
-    }
-
     private function getConnectionErrorSuggestion(\Exception $e): string
     {
         $message = $e->getMessage();

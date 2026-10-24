@@ -19,8 +19,6 @@ class OAuthFlowHandler
 {
     private const SPOTIFY_AUTH_URL = 'https://accounts.spotify.com/authorize';
 
-    private const SPOTIFY_TOKEN_URL = 'https://accounts.spotify.com/api/token';
-
     private ?string $authorizationCode = null;
 
     private ?string $state = null;
