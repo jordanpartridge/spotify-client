@@ -303,10 +303,12 @@ def release_footer(sha):
     link = (URL or "").strip()
     if not link and sha:
         link = f"https://github.com/{REPO}/commit/{sha}"
-    lines = [f"repo: {REPO}", f"version: {TAG}", f"commit: {sha or ''}"]
-    if link:
-        lines.append(link)
-    return "\n".join(lines)
+    return "\n".join([
+        f"repo: {REPO}",
+        f"version: {TAG}",
+        f"commit: {sha or ''}",
+        f"url: {link}",
+    ])
 
 
 def main():
