@@ -44,7 +44,10 @@
         "laravel": {
             "providers": [
                 "Jordanpartridge\\SpotifyClient\\SpotifyClientServiceProvider"
-            ]
+            ],
+            "aliases": {
+                "Spotify": "Jordanpartridge\\SpotifyClient\\Facades\\SpotifyFacade"
+            }
         }
     },
     "minimum-stability": "dev",
