@@ -2,12 +2,12 @@
 
 /**
  * User Library Management Examples
- * 
+ *
  * Demonstrates how to save tracks, albums, follow artists, and manage your personal Spotify library.
  * This keeps the music flowing and helps users build their perfect collection! 🎵
  */
 
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__.'/../vendor/autoload.php';
 
 use Jordanpartridge\SpotifyClient\Contracts\SpotifyClientInterface;
 
@@ -27,7 +27,7 @@ echo "💾 Saving multiple tracks...\n";
 $trackIds = [
     '4iV5W9uYEdYUVa79Axb7Rh', // Sweet Caroline
     '0VjIjW4GlUZAMYd2vXMi3b', // Blinding Lights
-    '4uLU6hMCjMI75M1A2tKUQC'  // Never Gonna Give You Up
+    '4uLU6hMCjMI75M1A2tKUQC',  // Never Gonna Give You Up
 ];
 $response = $spotify->library()->saveTracks($trackIds);
 echo "✅ Multiple tracks saved!\n\n";
@@ -69,7 +69,7 @@ echo "✅ Now following artist!\n\n";
 echo "🔍 Checking follow status...\n";
 $response = $spotify->library()->isFollowingArtist($artistId);
 $following = $response->json()[0];
-echo $following ? "✅ Following artist" : "❌ Not following artist";
+echo $following ? '✅ Following artist' : '❌ Not following artist';
 echo "\n\n";
 
 // 8. Get followed artists
